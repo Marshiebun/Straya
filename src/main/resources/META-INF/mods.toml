@@ -1,0 +1,38 @@
+modLoader="javafml" 
+
+loaderVersion="[43,)"
+
+license="All rights reserved"
+
+[[mods]] 
+modId="straya" #mandatory
+version="${file.jarVersion}"
+displayName="Straya"
+logoFile="straya.png" #optional
+credits="Created by @marshiebuns on Twitter"
+authors="Marshie"
+
+description='''
+Straya is a mod dedicated to all things Aussie!
+'''
+
+[[dependencies.straya]]
+    modId="forge"
+    mandatory=true
+    versionRange="[43,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.straya]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.19.2,1.20)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.aussie]]
+modId="geckolib"
+mandatory=true
+versionRange="[3.1.40,)"
+ordering="NONE"
+side="BOTH"
