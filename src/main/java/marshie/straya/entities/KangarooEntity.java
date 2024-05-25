@@ -3,6 +3,7 @@ package marshie.straya.entities;
 import java.util.Random;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -32,15 +33,14 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 @SuppressWarnings("removal")
-
 public class KangarooEntity extends Animal implements IAnimatable {
-	private final int textureIndex;
-	protected static final AnimationBuilder IDLE_ANIM = new AnimationBuilder().addAnimation("idle", true);
-	protected static final AnimationBuilder WALK_ANIM = new AnimationBuilder().addAnimation("walk", true);
-	protected static final AnimationBuilder HOP_ANIM = new AnimationBuilder().addAnimation("hop", true);
-	protected static final AnimationBuilder KICK_ANIM = new AnimationBuilder().addAnimation("kick", true);
-	protected static final AnimationBuilder JUMP_ANIM = new AnimationBuilder().addAnimation("jump", true);
-	
+    private int textureIndex;
+    protected static final AnimationBuilder IDLE_ANIM = new AnimationBuilder().addAnimation("idle", true);
+    protected static final AnimationBuilder WALK_ANIM = new AnimationBuilder().addAnimation("walk", true);
+    protected static final AnimationBuilder HOP_ANIM = new AnimationBuilder().addAnimation("hop", true);
+    protected static final AnimationBuilder KICK_ANIM = new AnimationBuilder().addAnimation("kick", true);
+    protected static final AnimationBuilder JUMP_ANIM = new AnimationBuilder().addAnimation("jump", true);
+
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public KangarooEntity(EntityType<? extends Animal> type, Level world) {
@@ -64,7 +64,7 @@ public class KangarooEntity extends Animal implements IAnimatable {
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
     }
-    
+
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 20.0)
@@ -76,16 +76,17 @@ public class KangarooEntity extends Animal implements IAnimatable {
     @Override
     public void registerControllers(final AnimationData data) {
         // Register animation controllers
-    	data.addAnimationController(new AnimationController<KangarooEntity>(this, "Idle", 5, this::idleAnimController));
-
+        data.addAnimationController(new AnimationController<KangarooEntity>(this, "controller", 5, this::animationPredicate));
     }
-    
-    protected <E extends IAnimatable> PlayState idleAnimController(final AnimationEvent<E> event) {
+
+    protected <E extends IAnimatable> PlayState animationPredicate(final AnimationEvent<E> event) {
         if (event.isMoving()) {
             event.getController().setAnimation(WALK_ANIM);
             return PlayState.CONTINUE;
+        } else {
+            event.getController().setAnimation(IDLE_ANIM);
+            return PlayState.CONTINUE;
         }
-        return PlayState.STOP;
     }
 
     @Override
@@ -93,14 +94,33 @@ public class KangarooEntity extends Animal implements IAnimatable {
         return this.factory;
     }
 
-	@Override
-	public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public static boolean checkKangarooSpawnRules(EntityType<KangarooEntity> entityType, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
+    @Override
+    public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static boolean checkKangarooSpawnRules(EntityType<KangarooEntity> entityType, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
         BlockState blockstate = level.getBlockState(pos.below());
         return blockstate.is(BlockTags.BASE_STONE_OVERWORLD) && level.getRawBrightness(pos, 0) > 8;
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        compound.putInt("TextureIndex", this.textureIndex);
+        System.out.println("Saving textureIndex: " + this.textureIndex); // Debugging line
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        if (compound.contains("TextureIndex")) {
+            this.textureIndex = compound.getInt("TextureIndex");
+            System.out.println("Loading textureIndex: " + this.textureIndex); // Debugging line
+        } else {
+            this.textureIndex = new Random().nextInt(7); // Default to a new random texture if none is found
+            System.out.println("No textureIndex found, assigning new random index: " + this.textureIndex); // Debugging line
+        }
     }
 }

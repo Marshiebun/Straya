@@ -4,11 +4,13 @@ import com.mojang.logging.LogUtils;
 
 import marshie.straya.client.renderer.KangarooRenderer;
 import marshie.straya.entities.KangarooEntity;
-import marshie.straya.init.ModEntityTypes;
+import marshie.straya.init.StrayaEntityTypes;
+import marshie.straya.init.StrayaItems;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
@@ -29,13 +31,15 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import software.bernie.geckolib3.GeckoLib;
 import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.animal.Animal;
+
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 @Mod(Straya.MODID)
 public class Straya
 {
     public static final String MODID = "straya";
-    
     private static final Logger LOGGER = LogUtils.getLogger();
     
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
@@ -46,35 +50,43 @@ public class Straya
 
     public Straya()
     {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        modEventBus.addListener(this::commonSetup);
-        ModEntityTypes.ENTITY_TYPES.register(modEventBus);
+        bus.addListener(this::commonSetup);
+        StrayaEntityTypes.ENTITY_TYPES.register(bus);
+        StrayaItems.ITEMS.register(bus);
 
-        BLOCKS.register(modEventBus);
-        ITEMS.register(modEventBus);
+        BLOCKS.register(bus);
+        ITEMS.register(bus);
         
-        modEventBus.addListener(this::setup);
-        modEventBus.addListener(this::doClientStuff);
+        bus.addListener(this::setup);
+        bus.addListener(this::doClientStuff);
 
         MinecraftForge.EVENT_BUS.register(this);
         
         GeckoLib.initialize();
     }
+    
+    public static final CreativeModeTab STRAYA_WILDLIFE = new CreativeModeTab(MODID) {
+        @Override
+        public @NotNull ItemStack makeIcon() {
+            return StrayaItems.KANGAROO_SPAWN_EGG.get().getDefaultInstance();
+        }
+    };
 
     @SuppressWarnings("deprecation")
 	private void commonSetup(final FMLCommonSetupEvent event)
     {
         event.enqueueWork(() -> {
-            SpawnPlacements.register(ModEntityTypes.KANGAROO.get(),
+            SpawnPlacements.register(StrayaEntityTypes.KANGAROO.get(),
                     SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                    KangarooEntity::checkKangarooSpawnRules);
+                    Animal::checkAnimalSpawnRules);
         });
     }
 
     @SubscribeEvent
     public void onAttributeCreate(EntityAttributeCreationEvent event) {
-        event.put(ModEntityTypes.KANGAROO.get(), KangarooEntity.createAttributes().build());
+        event.put(StrayaEntityTypes.KANGAROO.get(), KangarooEntity.createAttributes().build());
     }
 
     public void onServerStarting(ServerStartingEvent event)
@@ -87,13 +99,13 @@ public class Straya
 
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            EntityRenderers.register(ModEntityTypes.KANGAROO.get(), KangarooRenderer::new);
+            EntityRenderers.register(StrayaEntityTypes.KANGAROO.get(), KangarooRenderer::new);
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     private void doClientStuff(final FMLClientSetupEvent event) {
-        EntityRenderers.register(ModEntityTypes.KANGAROO.get(), KangarooRenderer::new);
+        EntityRenderers.register(StrayaEntityTypes.KANGAROO.get(), KangarooRenderer::new);
     }
 
     private void setup(final FMLCommonSetupEvent event) {

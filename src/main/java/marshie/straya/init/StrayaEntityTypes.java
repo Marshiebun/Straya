@@ -15,13 +15,15 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber(modid = Straya.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class ModEntityTypes {
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Straya.MODID);
+public class StrayaEntityTypes {
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
+    		DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Straya.MODID);
 
-    public static final RegistryObject<EntityType<KangarooEntity>> KANGAROO = ENTITY_TYPES.register("kangaroo",
-            () -> EntityType.Builder.of(KangarooEntity::new, MobCategory.CREATURE)
-                    .sized(0.6F, 1.95F) // Hitbox size
-                    .build(Straya.MODID + ":kangaroo"));
+    public static final RegistryObject<EntityType<KangarooEntity>> KANGAROO =
+    		ENTITY_TYPES.register("kangaroo",
+    				() -> EntityType.Builder.of(KangarooEntity::new, MobCategory.CREATURE)
+                    	.sized(0.6F, 1.95F) // Hitbox size
+                    	.build(Straya.MODID + ":kangaroo"));
 
     @SubscribeEvent
     public static void onAttributeCreation(EntityAttributeCreationEvent event) {

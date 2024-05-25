@@ -6,10 +6,9 @@
     "minecraft:savanna_plateau"
   ],
   "spawners": {
-    "type": "creature",
+    "type": "straya:kangaroo",
     "weight": 10,
     "minCount": 2,
-    "maxCount": 3,
-    "entityType": "straya:kangaroo"
+    "maxCount": 3
   }
 }

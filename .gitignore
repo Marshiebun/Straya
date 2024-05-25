@@ -14,12 +14,14 @@ out
 .idea
 
 # gradle
+wrapper
 build
 .gradle
 
 # other
 eclipse
 run
+logs
 
 # Files from Forge MDK
 forge*changelog.txt
