@@ -22,7 +22,7 @@ public class StrayaEntityTypes {
     public static final RegistryObject<EntityType<KangarooEntity>> KANGAROO =
     		ENTITY_TYPES.register("kangaroo",
     				() -> EntityType.Builder.of(KangarooEntity::new, MobCategory.CREATURE)
-                    	.sized(0.6F, 1.95F) // Hitbox size
+                    	.sized(0.8F, 1.95F) // Hitbox size
                     	.build(Straya.MODID + ":kangaroo"));
 
     @SubscribeEvent
@@ -32,7 +32,7 @@ public class StrayaEntityTypes {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 20.0)
+                .add(Attributes.MAX_HEALTH, 12.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.ATTACK_DAMAGE, 3.0);
     }
