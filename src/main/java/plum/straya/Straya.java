@@ -1,16 +1,11 @@
-package marshie.straya;
+package plum.straya;
 
 import com.mojang.logging.LogUtils;
 
-import marshie.straya.client.renderer.KangarooRenderer;
-import marshie.straya.entities.KangarooEntity;
-import marshie.straya.init.StrayaEntityTypes;
-import marshie.straya.init.StrayaItems;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
@@ -29,11 +24,17 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import plum.straya.client.renderer.KangarooRenderer;
+import plum.straya.entity.KangarooEntity;
+import plum.straya.init.StrayaBlocks;
+import plum.straya.init.StrayaEntityTypes;
+import plum.straya.init.StrayaItems;
+import plum.straya.world.feature.StrayaFeatures;
+import plum.straya.world.feature.StrayaPlacedFeatures;
 import software.bernie.geckolib3.GeckoLib;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.animal.Animal;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 @Mod(Straya.MODID)
@@ -54,10 +55,15 @@ public class Straya
 
         bus.addListener(this::commonSetup);
         StrayaEntityTypes.ENTITY_TYPES.register(bus);
+        StrayaBlocks.BLOCKS.register(bus);
+        StrayaBlocks.ITEMS.register(bus);
         StrayaItems.ITEMS.register(bus);
 
         BLOCKS.register(bus);
         ITEMS.register(bus);
+
+        StrayaFeatures.register(bus);
+        StrayaPlacedFeatures.register(bus);
         
         bus.addListener(this::setup);
         bus.addListener(this::doClientStuff);
@@ -66,13 +72,6 @@ public class Straya
         
         GeckoLib.initialize();
     }
-    
-    public static final CreativeModeTab STRAYA_WILDLIFE = new CreativeModeTab(MODID) {
-        @Override
-        public @NotNull ItemStack makeIcon() {
-            return StrayaItems.KANGAROO_SPAWN_EGG.get().getDefaultInstance();
-        }
-    };
 
     @SuppressWarnings("deprecation")
 	private void commonSetup(final FMLCommonSetupEvent event)
@@ -86,7 +85,7 @@ public class Straya
 
     @SubscribeEvent
     public void onAttributeCreate(EntityAttributeCreationEvent event) {
-        event.put(StrayaEntityTypes.KANGAROO.get(), KangarooEntity.createAttributes().build());
+        event.put(StrayaEntityTypes.KANGAROO.get(), KangarooEntity.createLivingAttributes().build());
     }
 
     public void onServerStarting(ServerStartingEvent event)

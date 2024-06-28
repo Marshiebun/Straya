@@ -1,4 +1,4 @@
-package marshie.straya.init.biomemodifier;
+package plum.straya.init.biomemodifier;
 
 public class KangarooBiomeModifier {
 

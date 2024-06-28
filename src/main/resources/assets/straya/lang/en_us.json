@@ -1,4 +1,16 @@
 {
+    "itemGroup.straya_wildlife": "Straya Wildlife",
+    "itemGroup.straya_decor": "Straya Decor",
+    "itemGroup.straya_items": "Straya Items",
+    
     "item.straya.kangaroo_spawn_egg": "Kangaroo Spawn Egg",
-    "itemGroup.straya.straya_wildlife": "Straya Wildlife"
+    
+    "entity.straya.kangaroo": "Kangaroo",
+    
+    "block.straya.kangaroo_paw": "Kangaroo Paw",
+    
+    "item.straya.kangaroo_paw": "Kangaroo Paw",
+    "item.straya.kangaroo_hide": "Kangaroo Hide",
+    "item.straya.hide_pouch": "Hide Pouch",
+    "item.straya.full_hide_pouch": "Pouch of Kangaroo Joey"
 }

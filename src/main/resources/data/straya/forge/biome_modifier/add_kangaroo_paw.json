@@ -1,0 +1,10 @@
+{
+  "type": "forge:add_features",
+  "biomes": [
+    "minecraft:savanna",
+    "minecraft:windswept_savanna",
+    "minecraft:savanna_plateau"
+  ],
+  "features": "straya:kangaroo_paw_placed",
+  "step": "vegetal_decoration"
+}

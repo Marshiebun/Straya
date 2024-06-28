@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "straya:item/full_hide_pouch"
+    }
+}

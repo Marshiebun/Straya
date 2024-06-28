@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " # ",
+        "S S",
+        "SSS"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:string"
+        },
+        "S": {
+            "item": "straya:kangaroo_hide"
+        }
+    },
+    "result": {
+        "item": "straya:hide_pouch",
+        "count": 1
+    }
+}
