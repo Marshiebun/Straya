@@ -97,10 +97,8 @@ public class KangarooEntity extends TamableAnimal implements IAnimatable {
     @Override
     public void tick() {
         super.tick();
-
         if (this.isOrderedToSit()) {
             this.getNavigation().stop();
-            return;
         }
     }
 
@@ -115,7 +113,7 @@ public class KangarooEntity extends TamableAnimal implements IAnimatable {
     }
 
     private <E extends IAnimatable> PlayState animationPredicate(AnimationEvent<E> event) {
-        if (!this.isOnGround()) {
+    	if (!this.isOnGround()) {
             event.getController().setAnimationSpeed(1);
             event.getController().setAnimation(JUMP_ANIM);
             return PlayState.CONTINUE;
@@ -302,6 +300,7 @@ public class KangarooEntity extends TamableAnimal implements IAnimatable {
         this.setOwnerUUID(player.getUUID());
     }
 
+    @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(DATA_VARIANT_ID, 0);
@@ -372,4 +371,5 @@ public class KangarooEntity extends TamableAnimal implements IAnimatable {
             this.spawnAtLocation(new ItemStack(StrayaItems.KANGAROO_HIDE.get(), count));
         }
     }
+
 }

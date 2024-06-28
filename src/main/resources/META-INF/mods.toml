@@ -2,15 +2,15 @@ modLoader="javafml"
 
 loaderVersion="[43,)"
 
-license="All rights reserved"
+license="MIT License"
 
 [[mods]] 
 modId="straya" #mandatory
 version="${file.jarVersion}"
 displayName="Straya"
 logoFile="straya.png" #optional
-credits="Created by @marshiebuns on Twitter"
-authors="Marshie"
+credits=""
+authors="Plum"
 
 description='''
 Straya is a mod dedicated to all things Aussie!
