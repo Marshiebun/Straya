@@ -1,6 +1,7 @@
 package plum.straya.init;
 
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item.Properties;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -20,6 +21,10 @@ public class StrayaItems {
             () -> new Item(new Item.Properties().tab(StrayaCreativeTabs.ITEMS).stacksTo(1)));
     public static final RegistryObject<Item> FULL_HIDE_POUCH = ITEMS.register("full_hide_pouch", 
             () -> new FullHidePouchItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> RAW_ROO_SHANK = ITEMS.register("raw_roo_shank",
+            () -> new Item(new Properties().tab(StrayaCreativeTabs.ITEMS).food(StrayaFoods.RAW_ROO_SHANK)));
+    public static final RegistryObject<Item> COOKED_ROO_SHANK = ITEMS.register("cooked_roo_shank",
+            () -> new Item(new Properties().tab(StrayaCreativeTabs.ITEMS).food(StrayaFoods.COOKED_ROO_SHANK)));
 
     private static Item.Properties props() {
         return new Item.Properties().tab(StrayaCreativeTabs.WILDLIFE);

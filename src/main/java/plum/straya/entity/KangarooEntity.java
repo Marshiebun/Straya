@@ -5,16 +5,23 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
@@ -34,6 +41,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.network.NetworkHooks;
+import plum.straya.client.container.PouchContainer;
 import plum.straya.init.StrayaBlocks;
 import plum.straya.init.StrayaEntityTypes;
 import plum.straya.init.StrayaItems;
@@ -63,6 +72,8 @@ public class KangarooEntity extends TamableAnimal implements IAnimatable {
 
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     private boolean highJump = false;
+    private final SimpleContainer pouchInventory = new SimpleContainer(6);
+    private final NonNullList<ItemStack> pouchItems = NonNullList.withSize(6, ItemStack.EMPTY);
 
     public KangarooEntity(EntityType<? extends KangarooEntity> type, Level world) {
         super(type, world);
@@ -225,6 +236,25 @@ public class KangarooEntity extends TamableAnimal implements IAnimatable {
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
+        
+        if (this.isTamed() && !this.isBaby() && hand == InteractionHand.MAIN_HAND) {
+            if (player.isShiftKeyDown()) {
+                if (!this.level.isClientSide) {
+                	SimpleContainer pouchInventory = this.pouchInventory;
+                    MutableComponent title;
+                    if (this.hasCustomName()) {
+                        title = Component.literal(this.getName().getString() + "'s Pouch");
+                    } else {
+                        title = Component.literal("Kangaroo's Pouch");
+                    }
+                    NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider(
+                        (windowId, playerInventory, playerEntity) -> new PouchContainer(windowId, playerInventory, pouchInventory),
+                        title
+                    ));
+                }
+                return InteractionResult.SUCCESS;
+            }
+        }
 
         // Prevent using Kangaroo Paw items on tamed kangaroos
         if (this.isTamed() && itemstack.is(StrayaBlocks.KANGAROO_PAW_ITEM.get())) {
@@ -309,23 +339,36 @@ public class KangarooEntity extends TamableAnimal implements IAnimatable {
         this.entityData.define(DATA_SITTING, false);
     }
 
-    public void addAdditionalSaveData(CompoundTag add) {
-        super.addAdditionalSaveData(add);
-        add.putInt("Variant", this.getVariant());
-        add.putBoolean("Tamed", this.isTamed());
-        add.putBoolean("Sitting", this.isSitting());
-        if (this.getOwnerUUID() != null) {
-            add.putUUID("OwnerUUID", this.getOwnerUUID());
+    @Override
+    public void readAdditionalSaveData(CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        this.setVariant(compound.getInt("Variant"));
+        this.setTamed(compound.getBoolean("Tamed"));
+        this.setSitting(compound.getBoolean("Sitting"));
+        ContainerHelper.loadAllItems(compound, this.pouchItems);
+        if (compound.hasUUID("OwnerUUID")) {
+            this.setOwnerUUID(compound.getUUID("OwnerUUID"));
+        }
+
+        for (int i = 0; i < pouchInventory.getContainerSize(); i++) {
+            pouchInventory.setItem(i, pouchItems.get(i));
         }
     }
 
-    public void readAdditionalSaveData(CompoundTag read) {
-        super.readAdditionalSaveData(read);
-        this.setVariant(read.getInt("Variant"));
-        this.setTamed(read.getBoolean("Tamed"));
-        this.setSitting(read.getBoolean("Sitting"));
-        if (read.hasUUID("OwnerUUID")) {
-            this.setOwnerUUID(read.getUUID("OwnerUUID"));
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        compound.putInt("Variant", this.getVariant());
+        compound.putBoolean("Tamed", this.isTamed());
+        compound.putBoolean("Sitting", this.isSitting());
+
+        for (int i = 0; i < pouchInventory.getContainerSize(); i++) {
+            pouchItems.set(i, pouchInventory.getItem(i));
+        }
+
+        ContainerHelper.saveAllItems(compound, this.pouchItems);
+        if (this.getOwnerUUID() != null) {
+            compound.putUUID("OwnerUUID", this.getOwnerUUID());
         }
     }
 
@@ -361,14 +404,21 @@ public class KangarooEntity extends TamableAnimal implements IAnimatable {
             this.getNavigation().stop();
         }
     }
+
+    public SimpleContainer getPouchInventory() {
+        return this.pouchInventory;
+    }
     
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
-        super.dropCustomDeathLoot(source, looting, recentlyHit);
-
-        if (recentlyHit) {
-            int count = this.random.nextInt(2) + 0; //Drops 0, 1 or 2 hide
-            this.spawnAtLocation(new ItemStack(StrayaItems.KANGAROO_HIDE.get(), count));
+    protected void dropEquipment() {
+        super.dropEquipment();
+        if (!this.getLevel().isClientSide) {
+            for (int i = 0; i < this.pouchInventory.getContainerSize(); i++) {
+                ItemStack stack = this.pouchInventory.getItem(i);
+                if (!stack.isEmpty()) {
+                    this.spawnAtLocation(stack);
+                }
+            }
         }
     }
 

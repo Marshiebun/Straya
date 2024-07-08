@@ -58,4 +58,8 @@ public class KangarooModel extends AnimatedGeoModel<KangarooEntity> {
 			}
 		}
 	}
+    
+    public IBone getBone(String boneName) {
+        return this.getAnimationProcessor().getBone(boneName);
+    }
 }

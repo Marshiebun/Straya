@@ -15,7 +15,7 @@ public class KangarooRenderer extends GeoEntityRenderer<KangarooEntity> {
 
     @Override
     public void render(KangarooEntity entity, float entityYaw, float partialTicks, PoseStack stack, MultiBufferSource bufferIn, int packedLightIn) {
-        if(entity.isBaby()) {
+        if (entity.isBaby()) {
             final float scale = 0.5F;
             stack.scale(scale, scale, scale);
         }

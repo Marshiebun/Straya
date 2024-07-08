@@ -2,6 +2,7 @@ package plum.straya;
 
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -24,8 +25,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import plum.straya.client.container.PouchScreen;
 import plum.straya.client.renderer.KangarooRenderer;
 import plum.straya.entity.KangarooEntity;
+import plum.straya.init.ContainerTypeRegistry;
 import plum.straya.init.StrayaBlocks;
 import plum.straya.init.StrayaEntityTypes;
 import plum.straya.init.StrayaItems;
@@ -52,6 +55,7 @@ public class Straya
     public Straya()
     {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        ContainerTypeRegistry.CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         bus.addListener(this::commonSetup);
         StrayaEntityTypes.ENTITY_TYPES.register(bus);
@@ -95,10 +99,10 @@ public class Straya
 
     @Mod.EventBusSubscriber(modid = Straya.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public class ClientEventBusSubscriber {
-
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(StrayaEntityTypes.KANGAROO.get(), KangarooRenderer::new);
+            MenuScreens.register(ContainerTypeRegistry.POUCH_CONTAINER.get(), PouchScreen::new);
         }
     }
 
